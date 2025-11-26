@@ -1,0 +1,119 @@
+:root {
+    --bg-color: #0f172a;
+    --canvas-bg: #1e293b;
+    --snake-color: #4ade80;
+    --snake-glow: 0 0 10px #4ade80, 0 0 20px #4ade80;
+    --food-color: #f87171;
+    --food-glow: 0 0 10px #f87171, 0 0 20px #f87171;
+    --text-color: #e2e8f0;
+    --accent-color: #38bdf8;
+}
+
+* {
+    margin: 0;
+    padding: 0;
+    box-sizing: border-box;
+}
+
+body {
+    font-family: 'Inter', sans-serif;
+    background-color: var(--bg-color);
+    color: var(--text-color);
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    min-height: 100vh;
+    overflow: hidden;
+}
+
+.game-container {
+    text-align: center;
+    position: relative;
+}
+
+.header {
+    margin-bottom: 20px;
+}
+
+h1 {
+    font-size: 3rem;
+    font-weight: 700;
+    margin-bottom: 10px;
+    background: linear-gradient(to right, var(--snake-color), var(--accent-color));
+    -webkit-background-clip: text;
+    -webkit-text-fill-color: transparent;
+    text-shadow: 0 0 30px rgba(74, 222, 128, 0.3);
+}
+
+.score-board {
+    font-size: 1.5rem;
+    font-weight: 700;
+    color: var(--text-color);
+}
+
+.canvas-wrapper {
+    position: relative;
+    display: inline-block;
+    padding: 4px;
+    background: linear-gradient(45deg, var(--snake-color), var(--food-color));
+    border-radius: 4px;
+    box-shadow: 0 0 20px rgba(0, 0, 0, 0.5);
+}
+
+canvas {
+    background-color: var(--canvas-bg);
+    display: block;
+    border-radius: 2px;
+}
+
+.overlay {
+    position: absolute;
+    top: 0;
+    left: 0;
+    width: 100%;
+    height: 100%;
+    background: rgba(15, 23, 42, 0.85);
+    display: flex;
+    flex-direction: column;
+    justify-content: center;
+    align-items: center;
+    color: white;
+    backdrop-filter: blur(4px);
+}
+
+.hidden {
+    display: none;
+}
+
+h2 {
+    font-size: 2rem;
+    margin-bottom: 1rem;
+    color: var(--accent-color);
+}
+
+p {
+    font-size: 1.1rem;
+    opacity: 0.8;
+    margin-bottom: 1.5rem;
+}
+
+button {
+    background: var(--snake-color);
+    color: var(--bg-color);
+    border: none;
+    padding: 12px 24px;
+    font-size: 1.1rem;
+    font-weight: bold;
+    border-radius: 6px;
+    cursor: pointer;
+    transition: transform 0.1s, box-shadow 0.2s;
+}
+
+button:hover {
+    transform: scale(1.05);
+    box-shadow: 0 0 15px var(--snake-color);
+}
+
+button:active {
+    transform: scale(0.95);
+}
