@@ -11,8 +11,8 @@ const TILE_COUNT = canvas.width / GRID_SIZE;
 
 let score = 0;
 let snake = [];
-let foods = [];
-let obstacles = [];
+let foods = []; // Changed from single food to array
+let obstacles = []; // Array for obstacles
 let currentSnakeColor = '#4ade80';
 let dx = 0;
 let dy = 0;
@@ -53,12 +53,15 @@ function getRandomPos() {
 }
 
 function isOccupied(x, y) {
+    // Check snake
     for (let part of snake) {
         if (part.x === x && part.y === y) return true;
     }
+    // Check foods
     for (let f of foods) {
         if (f.x === x && f.y === y) return true;
     }
+    // Check obstacles
     for (let obs of obstacles) {
         if (obs.x === x && obs.y === y) return true;
     }
@@ -66,6 +69,8 @@ function isOccupied(x, y) {
 }
 
 function spawnFoods() {
+    // Level 1: 1 food
+    // Level 2 (Score >= 100): 3 foods
     let targetFoodCount = score >= 100 ? 3 : 1;
 
     while (foods.length < targetFoodCount) {
@@ -84,10 +89,18 @@ function spawnFoods() {
 function spawnObstacles() {
     if (score < 200) return;
 
+    // Level 3 (Score >= 200): Spawn obstacles
+    // Let's maintain a certain number of obstacles, e.g., 5
     let targetObstacleCount = 5;
+
+    // Add more obstacles as score increases? Let's keep it simple first.
+    // Or maybe spawn a new one every time food is eaten?
+    // The requirement says "randomly appear". 
+    // Let's just ensure we have enough obstacles.
 
     while (obstacles.length < targetObstacleCount) {
         let pos = getRandomPos();
+        // Ensure not too close to snake head to avoid instant death
         while (isOccupied(pos.x, pos.y) || (Math.abs(pos.x - snake[0].x) < 5 && Math.abs(pos.y - snake[0].y) < 5)) {
             pos = getRandomPos();
         }
@@ -104,10 +117,12 @@ function drawRect(x, y, color, glow) {
 }
 
 function drawObstacle(x, y) {
-    ctx.fillStyle = '#334155';
+    // Draw background block
+    ctx.fillStyle = '#334155'; // Dark slate
     ctx.fillRect(x * GRID_SIZE, y * GRID_SIZE, GRID_SIZE - 2, GRID_SIZE - 2);
 
-    ctx.strokeStyle = '#ef4444';
+    // Draw Death Icon (X)
+    ctx.strokeStyle = '#ef4444'; // Red
     ctx.lineWidth = 2;
     ctx.beginPath();
     ctx.moveTo(x * GRID_SIZE + 4, y * GRID_SIZE + 4);
@@ -118,11 +133,17 @@ function drawObstacle(x, y) {
 }
 
 function draw() {
+    // Clear canvas
     ctx.fillStyle = '#1e293b';
     ctx.fillRect(0, 0, canvas.width, canvas.height);
 
+    // Draw Obstacles
     obstacles.forEach(obs => drawObstacle(obs.x, obs.y));
+
+    // Draw Foods
     foods.forEach(f => drawRect(f.x, f.y, f.color));
+
+    // Draw Snake
     snake.forEach((part, index) => {
         drawRect(part.x, part.y, currentSnakeColor);
     });
@@ -131,11 +152,13 @@ function draw() {
 function moveSnake() {
     const head = { x: snake[0].x + dx, y: snake[0].y + dy };
 
+    // Wall Collision
     if (head.x < 0 || head.x >= TILE_COUNT || head.y < 0 || head.y >= TILE_COUNT) {
         gameOver();
         return;
     }
 
+    // Self Collision
     for (let part of snake) {
         if (head.x === part.x && head.y === part.y) {
             gameOver();
@@ -143,6 +166,7 @@ function moveSnake() {
         }
     }
 
+    // Obstacle Collision
     for (let obs of obstacles) {
         if (head.x === obs.x && head.y === obs.y) {
             gameOver();
@@ -152,6 +176,7 @@ function moveSnake() {
 
     snake.unshift(head);
 
+    // Eat Food
     let eatenIndex = -1;
     for (let i = 0; i < foods.length; i++) {
         if (head.x === foods[i].x && head.y === foods[i].y) {
@@ -164,9 +189,9 @@ function moveSnake() {
         score += 10;
         scoreElement.innerText = score;
         currentSnakeColor = foods[eatenIndex].color;
-        foods.splice(eatenIndex, 1);
-        spawnFoods();
-        spawnObstacles();
+        foods.splice(eatenIndex, 1); // Remove eaten food
+        spawnFoods(); // Spawn new food(s)
+        spawnObstacles(); // Check if obstacles need to spawn
     } else {
         snake.pop();
     }
@@ -199,26 +224,7 @@ function gameOver() {
     gameOverScreen.classList.remove('hidden');
 }
 
-function changeDirection(direction) {
-    if (!isGameRunning) return;
-
-    switch (direction) {
-        case 'up':
-            if (dy !== 1) { dx = 0; dy = -1; }
-            break;
-        case 'down':
-            if (dy !== -1) { dx = 0; dy = 1; }
-            break;
-        case 'left':
-            if (dx !== 1) { dx = -1; dy = 0; }
-            break;
-        case 'right':
-            if (dx !== -1) { dx = 1; dy = 0; }
-            break;
-    }
-}
-
-// Keyboard input handling
+// Input handling
 document.addEventListener('keydown', (e) => {
     if (e.code === 'Space' && !isGameRunning && !isGameOver) {
         startGame();
@@ -230,123 +236,29 @@ document.addEventListener('keydown', (e) => {
         case 'ArrowUp':
         case 'w':
         case 'W':
-            changeDirection('up');
+            if (dy !== 1) { dx = 0; dy = -1; }
             break;
         case 'ArrowDown':
         case 's':
         case 'S':
-            changeDirection('down');
+            if (dy !== -1) { dx = 0; dy = 1; }
             break;
         case 'ArrowLeft':
         case 'a':
         case 'A':
-            changeDirection('left');
+            if (dx !== 1) { dx = -1; dy = 0; }
             break;
         case 'ArrowRight':
         case 'd':
         case 'D':
-            changeDirection('right');
+            if (dx !== -1) { dx = 1; dy = 0; }
             break;
     }
 });
 
-// Touch input handling for mobile
-let touchStartX = 0;
-let touchStartY = 0;
-
-canvas.addEventListener('touchstart', (e) => {
-    e.preventDefault();
-    
-    if (!isGameRunning && !isGameOver) {
-        startGame();
-        return;
-    }
-
-    const touch = e.touches[0];
-    touchStartX = touch.clientX;
-    touchStartY = touch.clientY;
-}, { passive: false });
-
-canvas.addEventListener('touchmove', (e) => {
-    e.preventDefault();
-}, { passive: false });
-
-canvas.addEventListener('touchend', (e) => {
-    e.preventDefault();
-    
-    if (!isGameRunning) return;
-
-    const touch = e.changedTouches[0];
-    const touchEndX = touch.clientX;
-    const touchEndY = touch.clientY;
-
-    const deltaX = touchEndX - touchStartX;
-    const deltaY = touchEndY - touchStartY;
-
-    const minSwipeDistance = 30;
-
-    if (Math.abs(deltaX) > Math.abs(deltaY)) {
-        if (Math.abs(deltaX) > minSwipeDistance) {
-            if (deltaX > 0) {
-                changeDirection('right');
-            } else {
-                changeDirection('left');
-            }
-        }
-    } else {
-        if (Math.abs(deltaY) > minSwipeDistance) {
-            if (deltaY > 0) {
-                changeDirection('down');
-            } else {
-                changeDirection('up');
-            }
-        }
-    }
-}, { passive: false });
-
-// Virtual D-Pad button handling
-const dpadButtons = document.querySelectorAll('.dpad-btn');
-dpadButtons.forEach(btn => {
-    btn.addEventListener('touchstart', (e) => {
-        e.preventDefault();
-        const direction = btn.dataset.direction;
-        
-        if (!isGameRunning && !isGameOver) {
-            startGame();
-        } else {
-            changeDirection(direction);
-        }
-    }, { passive: false });
-
-    // Also support mouse clicks for testing
-    btn.addEventListener('click', (e) => {
-        e.preventDefault();
-        const direction = btn.dataset.direction;
-        
-        if (!isGameRunning && !isGameOver) {
-            startGame();
-        } else {
-            changeDirection(direction);
-        }
-    });
-});
-
-// Start screen tap to start (mobile)
-startScreen.addEventListener('touchstart', (e) => {
-    e.preventDefault();
-    if (!isGameRunning && !isGameOver) {
-        startGame();
-    }
-}, { passive: false });
-
 restartBtn.addEventListener('click', () => {
     startGame();
 });
-
-// Prevent scrolling on mobile
-document.body.addEventListener('touchmove', (e) => {
-    e.preventDefault();
-}, { passive: false });
 
 // Initial draw
 initGame();
