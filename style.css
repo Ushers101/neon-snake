@@ -24,11 +24,15 @@ body {
     align-items: center;
     min-height: 100vh;
     overflow: hidden;
+    -webkit-tap-highlight-color: transparent;
 }
 
 .game-container {
     text-align: center;
     position: relative;
+    width: 100%;
+    max-width: 650px;
+    padding: 10px;
 }
 
 .header {
@@ -58,12 +62,15 @@ h1 {
     background: linear-gradient(45deg, var(--snake-color), var(--food-color));
     border-radius: 4px;
     box-shadow: 0 0 20px rgba(0, 0, 0, 0.5);
+    max-width: 100%;
 }
 
 canvas {
     background-color: var(--canvas-bg);
     display: block;
     border-radius: 2px;
+    max-width: 100%;
+    height: auto;
 }
 
 .overlay {
@@ -107,6 +114,8 @@ button {
     border-radius: 6px;
     cursor: pointer;
     transition: transform 0.1s, box-shadow 0.2s;
+    -webkit-tap-highlight-color: transparent;
+    user-select: none;
 }
 
 button:hover {
@@ -116,4 +125,158 @@ button:hover {
 
 button:active {
     transform: scale(0.95);
+}
+
+/* Virtual D-Pad Styles */
+.virtual-dpad {
+    position: relative;
+    width: 200px;
+    height: 200px;
+    margin: 30px auto 0;
+    display: none; /* Hidden by default, shown on mobile */
+}
+
+.dpad-btn {
+    position: absolute;
+    width: 60px;
+    height: 60px;
+    background: rgba(74, 222, 128, 0.2);
+    border: 2px solid var(--snake-color);
+    border-radius: 8px;
+    font-size: 24px;
+    color: var(--snake-color);
+    cursor: pointer;
+    transition: all 0.1s;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    user-select: none;
+    -webkit-user-select: none;
+    touch-action: manipulation;
+}
+
+.dpad-btn:active {
+    background: rgba(74, 222, 128, 0.4);
+    box-shadow: 0 0 15px var(--snake-color);
+    transform: scale(0.95);
+}
+
+.dpad-up {
+    top: 0;
+    left: 50%;
+    transform: translateX(-50%);
+}
+
+.dpad-down {
+    bottom: 0;
+    left: 50%;
+    transform: translateX(-50%);
+}
+
+.dpad-left {
+    left: 0;
+    top: 50%;
+    transform: translateY(-50%);
+}
+
+.dpad-right {
+    right: 0;
+    top: 50%;
+    transform: translateY(-50%);
+}
+
+/* Mobile Responsive Styles */
+@media (max-width: 768px) {
+    h1 {
+        font-size: 2rem;
+    }
+
+    .score-board {
+        font-size: 1.2rem;
+    }
+
+    h2 {
+        font-size: 1.5rem;
+    }
+
+    p {
+        font-size: 0.9rem;
+        padding: 0 10px;
+    }
+
+    .virtual-dpad {
+        display: block; /* Show D-Pad on mobile */
+    }
+
+    canvas {
+        width: 100%;
+        height: auto;
+    }
+
+    .canvas-wrapper {
+        width: 100%;
+    }
+}
+
+@media (max-width: 480px) {
+    .game-container {
+        padding: 5px;
+    }
+
+    h1 {
+        font-size: 1.5rem;
+        margin-bottom: 5px;
+    }
+
+    .score-board {
+        font-size: 1rem;
+    }
+
+    .header {
+        margin-bottom: 10px;
+    }
+
+    .virtual-dpad {
+        width: 160px;
+        height: 160px;
+        margin: 20px auto 0;
+    }
+
+    .dpad-btn {
+        width: 50px;
+        height: 50px;
+        font-size: 20px;
+    }
+}
+
+/* Landscape mode optimization */
+@media (max-height: 600px) and (orientation: landscape) {
+    .game-container {
+        display: flex;
+        align-items: center;
+        gap: 20px;
+    }
+
+    .header {
+        position: absolute;
+        top: 10px;
+        left: 50%;
+        transform: translateX(-50%);
+        margin: 0;
+        z-index: 10;
+    }
+
+    h1 {
+        font-size: 1.5rem;
+        margin-bottom: 0;
+    }
+
+    .score-board {
+        display: inline-block;
+        margin-left: 20px;
+    }
+
+    .virtual-dpad {
+        margin: 0;
+    }
 }
